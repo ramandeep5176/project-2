@@ -11,7 +11,7 @@ const GithubContext = React.createContext();
 const GithubProvider = ({ children }) => {
   const [githubUser, setGithubUser] = useState(mockUser);
   const [repos, setRepos] = useState(mockRepos);
-  const [followers, setFolloers] = useState(mockFollowers);
+  const [followers, setFollowers] = useState(mockFollowers);
 
   // request loading
   const [requests, setRequests] = useState(0);
@@ -22,18 +22,27 @@ const GithubProvider = ({ children }) => {
 
   const searchGithubUser = async (user) => {
     toggleError();
-    setIsLoading(true)
+    setIsLoading(true);
     const response = await axios(`${rootUrl}/users/${user}`).catch((err) =>
       console.log(err)
     );
     // console.log(response);
     if (response) {
       setGithubUser(response.data);
+      const { login, followers_url } = response.data;
+      // repos
+      axios(`${rootUrl}/users/${login}/repos?per_page=100`).then((response) =>
+        setRepos(response.data)
+      );
+      // followers
+      axios(`${followers_url}?per_page=100`).then((response) =>
+        setFollowers(response.data)
+      );
     } else {
       toggleError(true, "no user found");
     }
-    checkRequests()
-    setIsLoading(false)
+    checkRequests();
+    setIsLoading(false);
   };
 
   // check rate
@@ -77,3 +86,4 @@ const GithubProvider = ({ children }) => {
 };
 
 export { GithubProvider, GithubContext };
+//
