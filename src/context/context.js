@@ -39,7 +39,7 @@ const GithubProvider = ({ children }) => {
         setFollowers(response.data)
       );
     } else {
-      toggleError(true, "no user found");
+      toggleError(true, "Oops! no user found");
     }
     checkRequests();
     setIsLoading(false);
@@ -50,12 +50,11 @@ const GithubProvider = ({ children }) => {
     axios(`${rootUrl}/rate_limit`)
       .then(({ data }) => {
         let {
-          rate: { remaning },
+          rate: { remaining },
         } = data;
-        // remaning = 0;
-        setRequests(remaning);
-        if (remaning === 0) {
-          toggleError(true, "sorry,hourly rate limit is excedded!");
+        setRequests(remaining);
+        if (remaining === 0) {
+          toggleError(true, "sorry, you have exceeded your hourly rate limit!");
         }
       })
       .catch((err) => console.log(err));
@@ -67,6 +66,10 @@ const GithubProvider = ({ children }) => {
   }
 
   useEffect(checkRequests, []);
+
+  useEffect(() => {
+    searchGithubUser("ramandeep5176");
+  }, []);
 
   return (
     <GithubContext.Provider
